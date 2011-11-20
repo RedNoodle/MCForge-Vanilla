@@ -47,7 +47,7 @@ namespace MCForge
 
             foreach (string line3 in File.ReadAllLines("text/rankinfo.txt"))
             {
-                if (line3.ToLower().Contains(message.ToLower()))
+                if (line3.Split(' ')[0].ToLower().Contains(message.ToLower()))
                 {
                     string newrank = line3.Split(' ')[7];
                     string oldrank = line3.Split(' ')[8];

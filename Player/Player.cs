@@ -1238,7 +1238,10 @@ namespace MCForge
                 if (Blockchange.Method.ToString().IndexOf("AboutBlockchange") == -1 && !level.name.Contains("Museum " + Server.DefaultColor))
                 {
                     bP.deleted = true;
-                    level.blockCache.Add(bP);
+                    if (this.group.Permission <= level.perbuildmax && this.group.Permission >= level.permissionbuild)
+                    {
+                        level.blockCache.Add(bP);
+                    }
                 }
 
                 Blockchange(this, x, y, z, type);
@@ -1268,7 +1271,7 @@ namespace MCForge
                     if (lastCMD != "click")
                     {
                         Server.s.Log(name + " attempted to build with a " + Diff.ToString() + " distance offset");
-                        GlobalMessageOps("To Ops &f-" + color + name + "&f- attempted to build with a " + Diff.ToString() + " distance offset");
+                        //GlobalMessageOps("To Ops &f-" + color + name + "&f- attempted to build with a " + Diff.ToString() + " distance offset"); //Spams Opchat occassionally, and is this even useful for most Ops?
                         SendMessage("You can't build that far away.");
                         SendBlockchange(x, y, z, b); return;
                     }
@@ -1349,13 +1352,19 @@ namespace MCForge
                 }
 
                 bP.deleted = true;
-                level.blockCache.Add(bP);
+                if (this.group.Permission <= level.perbuildmax && this.group.Permission >= level.permissionbuild)
+                {
+                    level.blockCache.Add(bP);
+                }
                 deleteBlock(b, type, x, y, z);
             }
             else
             {
                 bP.deleted = false;
-                level.blockCache.Add(bP);
+                if (this.group.Permission <= level.perbuildmax && this.group.Permission >= level.permissionbuild)
+                {
+                    level.blockCache.Add(bP);
+                }
                 placeBlock(b, type, x, y, z);
             }
         }

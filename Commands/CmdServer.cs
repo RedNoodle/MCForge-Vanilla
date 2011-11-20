@@ -234,7 +234,7 @@ namespace MCForge {
 
             Server.backupLocation = System.Windows.Forms.Application.StartupPath + "/levels/backups";
             Server.backupInterval = 300;
-            Server.blockInterval = 60;
+            Server.blockInterval = 10; // Saves blockchanges to database more often
 
             Server.physicsRestart = true;
             Server.deathcount = true;

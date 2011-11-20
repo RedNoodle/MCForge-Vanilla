@@ -33,22 +33,13 @@ namespace MCForge
 
         public override void Use(Player p, string message)
         {
-            string alltext = File.ReadAllText("text/rankinfo.txt");
-            if (message == "")
-            {
-                Help(p);
-                Player.SendMessage(p, "&cYou need to enter a player!");
-                return;
-            }
-            Player who2 = Player.Find(message);
-            if (who2 == null)
-            {
-                Player.SendMessage(p, "&cPlayer &e" + message + "&cHas not been found!");
-                return;
-            }
-            if (alltext.Contains(message) == false)
+            if (message == "") { message = p.name.ToString(); }
+            if (Player.Find(message) != null) { message = Player.Find(message).name.ToString(); }
+            string alltext = File.ReadAllText("text/rankinfo.txt").ToLower();
+            if (alltext.ToLower().Contains(message.ToLower()) == false)
             {
                 Player.SendMessage(p, "&cPlayer &a" + message + "&c has not been ranked yet!");
+            //    Player.SendMessage(p, alltext);
                 return;
             }
             
@@ -56,11 +47,12 @@ namespace MCForge
 
             foreach (string line3 in File.ReadAllLines("text/rankinfo.txt"))
             {
-                if (line3.Contains(message))
+                if (line3.ToLower().Contains(message.ToLower()))
                 {
                     string newrank = line3.Split(' ')[7];
                     string oldrank = line3.Split(' ')[8];
                     string assigner = line3.Split(' ')[1];
+                    string whoinfo = line3.Split(' ')[0];
                     Group newrankcolor = Group.Find(newrank);
                     Group oldrankcolor = Group.Find(oldrank);
                     int minutes = Convert.ToInt32(line3.Split(' ')[2]);
@@ -69,7 +61,7 @@ namespace MCForge
                     int months = Convert.ToInt32(line3.Split(' ')[5]);
                     int years = Convert.ToInt32(line3.Split(' ')[6]);
                     DateTime ExpireDate = new DateTime(years, months, days, hours, minutes, 0);
-                    Player.SendMessage(p, "&1Rank Information of " + message);
+                    Player.SendMessage(p, "&1Rank Information of " + whoinfo);
                     Player.SendMessage(p, "&aNew rank: " + newrankcolor.color + newrank);
                     Player.SendMessage(p, "&aOld Rank: " + oldrankcolor.color + oldrank);
                     Player.SendMessage(p, "&aDate of assignment: " + ExpireDate.ToString());

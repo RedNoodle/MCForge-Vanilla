@@ -602,6 +602,22 @@ namespace MCForge
                 Database.executeQuery("CREATE TABLE if not exists Players (ID INTEGER " + (Server.useMySQL ? "" : "PRIMARY KEY ") + "AUTO" + (Server.useMySQL ? "_" : "") + "INCREMENT NOT NULL, Name VARCHAR(20), IP CHAR(15), FirstLogin DATETIME, LastLogin DATETIME, totalLogin MEDIUMINT, Title CHAR(20), TotalDeaths SMALLINT, Money MEDIUMINT UNSIGNED, totalBlocks BIGINT, totalCuboided BIGINT, totalKicked MEDIUMINT, TimeSpent VARCHAR(20), color VARCHAR(6), title_color VARCHAR(6)" + (Server.useMySQL ? ", PRIMARY KEY (ID)" : "") + ");");
 				Database.executeQuery("CREATE TABLE if not exists Playercmds (ID INTEGER " + (Server.useMySQL ? "" : "PRIMARY KEY ") + "AUTO" + (Server.useMySQL ? "_" : "") + "INCREMENT NOT NULL, Time DATETIME, Name VARCHAR(20), Rank VARCHAR(20), Mapname VARCHAR(40), Cmd VARCHAR(40), Cmdmsg VARCHAR(40)" + (Server.useMySQL ? ", PRIMARY KEY (ID)" : "") + ");");
 
+                DataTable Inboxes = Server.useMySQL ? MySQL.fillData("SHOW TABLES LIKE 'Inbox%'") : SQLite.fillData("SHOW TABLES LIKE 'Inbox%'");
+                if (Inboxes.Rows.Count != 0)
+                {
+                    Server.s.Log("--------------------------");
+                    Server.s.Log("Obsolete SQL Tables Found!");
+                    Server.s.Log("Attempting to rename...");
+                    foreach (DataRow Inbox in Inboxes.Rows)
+                    {
+                        Database.executeQuery("RENAME TABLE " + Inbox[0] + " TO " + Inbox[0].ToString().ToLower());
+                        Server.s.Log("'" + Inbox[0] + "' To: '" + Inbox[0].ToString().ToLower() + "'");
+                    }
+                    Server.s.Log("        All Done!         ");
+                    Server.s.Log("--------------------------");
+                }
+                Inboxes.Dispose();
+
                 // Here, since SQLite is a NEW thing from 5.3.0.0, we do not have to check for existing tables in SQLite.
                 if (Server.useMySQL) {
                     // Check if the color column exists.

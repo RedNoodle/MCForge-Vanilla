@@ -49,10 +49,10 @@ namespace MCForge
 
             //DB
             if (message.Length > 255 && Server.useMySQL) { Player.SendMessage(p, "Message was too long. The text below has been trimmed."); Player.SendMessage(p, message.Substring(256)); message = message.Remove(256); }
-                Database.executeQuery("CREATE TABLE if not exists `Inbox" + whoTo + "` (PlayerFrom CHAR(20), TimeSent DATETIME, Contents VARCHAR(255));");
+                Database.executeQuery("CREATE TABLE if not exists `inbox" + whoTo.ToLower() + "` (PlayerFrom CHAR(20), TimeSent DATETIME, Contents VARCHAR(255));");
                 if (!Server.useMySQL)
                     Server.s.Log(message.Replace("'", "\\'"));
-                Database.executeQuery("INSERT INTO `Inbox" + whoTo + "` (PlayerFrom, TimeSent, Contents) VALUES ('" + fromname + "', '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "', '" + message.Replace("'", (Server.useMySQL ? "\\'" : "''")) + "')");
+                Database.executeQuery("INSERT INTO `inbox" + whoTo.ToLower() + "` (PlayerFrom, TimeSent, Contents) VALUES ('" + fromname + "', '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "', '" + message.Replace("'", (Server.useMySQL ? "\\'" : "''")) + "')");
             //DB
 
             Player.SendMessage(p, "Message sent to &5" + whoTo + ".");

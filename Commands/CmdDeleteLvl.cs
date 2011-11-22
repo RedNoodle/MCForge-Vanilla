@@ -65,9 +65,7 @@ namespace MCForge
                     catch { }
                     try { File.Delete("levels/level properties/" + message); }
                     catch { }
-
-                    if (Server.useMySQL) MySQL.executeQuery("DROP TABLE `Block" + message + "`, `Portals" + message + "`, `Messages" + message + "`, `Zone" + message + "`"); else SQLite.executeQuery("DROP TABLE Block" + message + ", Portals" + message + ", Messages" + message + " Zone" + message + "");
-
+                    if (Server.useMySQL) MySQL.executeQuery("DROP TABLE IF EXISTS `Block" + message + "`, `Portals" + message + "`, `Messages" + message + "`, `Zone" + message + "`"); else SQLite.executeQuery("DROP TABLE IF EXISTS Block" + message + ", Portals" + message + ", Messages" + message + " Zone" + message + "");
                     Player.GlobalMessage("Level " + message + " was deleted.");
                 }
                 else

@@ -1092,6 +1092,27 @@ namespace MCForge
             }
 
             if (Server.zombie.ZombieStatus() != 0) { Player.SendMessage(this, "There is a Zombie Survival game currently in-progress! Join it by typing /g " + Server.zombie.currentLevelName); }
+
+            DataTable InboxExist = Server.useMySQL ? MySQL.fillData("SHOW TABLES LIKE 'inbox" + name.ToLower() + "'") : SQLite.fillData("SHOW TABLES LIKE 'inbox" + name.ToLower() + "'");
+            if (InboxExist.Rows.Count != 0)
+            {
+                DataTable InboxCount = Server.useMySQL ? MySQL.fillData("SELECT `PlayerFrom` FROM inbox" + name.ToLower() + " ") : SQLite.fillData("SELECT `PlayerFrom` FROM inbox" + name.ToLower());
+                if (InboxCount.Rows.Count != 0)
+                {
+                    if (InboxCount.Rows.Count == 1)
+                    {
+                        SendMessage(color + "You have &41" + color + " message! &4Check your &c/inbox");
+                        InboxCount.Dispose();
+                    }
+                    if (InboxCount.Rows.Count > 1)
+                    {
+                        SendMessage(color + "You have &4" + InboxCount.Rows.Count + color + " messages! &4Check your &c/inbox");
+                        InboxCount.Dispose();
+                    }
+                }
+            }
+            InboxExist.Dispose();
+
         }
 
         public void SetPrefix()

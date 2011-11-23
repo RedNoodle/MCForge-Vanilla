@@ -558,6 +558,42 @@ namespace MCForge
                 }
             }
 
+            // Function to rename all current password files
+            DirectoryInfo passdir = new DirectoryInfo("extra/passwords/");
+            foreach (FileInfo passfile in passdir.GetFiles("*.xml"))
+            {
+                if (passfile.Name.ToString() != passfile.Name.ToLower())
+                {
+                    Server.s.Log("Incorrect case in password file!");
+                    Server.s.Log("Attempting to rename '" + passfile.Name.ToString() + "'");
+                    passfile.MoveTo(passdir + passfile.Name.ToLower());
+                }
+            }
+
+            // Function to rename all current undo files
+            DirectoryInfo undodir = new DirectoryInfo("extra/undo/");
+            foreach (DirectoryInfo undosubdir in undodir.GetDirectories())
+            {
+                if (undosubdir.Name.ToString() != undosubdir.Name.ToLower())
+                {
+                    Server.s.Log("Incorrect case in undo subfolder!");
+                    Server.s.Log("Attempting to rename subfolder '" + undosubdir.Name.ToString() + "'");
+                    undosubdir.MoveTo(undodir + undosubdir.Name.ToLower());
+				}
+			}
+
+			// Function to rename all current undoPrevious files
+            DirectoryInfo undoprevdir = new DirectoryInfo("extra/undoPrevious/");
+            foreach (DirectoryInfo undoprevsubdir in undoprevdir.GetDirectories())
+            {
+                if (undoprevsubdir.Name.ToString() != undoprevsubdir.Name.ToLower())
+                {
+                    Server.s.Log("Incorrect case in undoPrevious subfolder!");
+                    Server.s.Log("Attempting to rename subfolder '" + undoprevsubdir.Name.ToString() + "'");
+                    undoprevsubdir.MoveTo(undoprevdir + undoprevsubdir.Name.ToLower());
+                }
+			}
+
             LoadAllSettings();
 
             if (File.Exists("text/emotelist.txt"))
@@ -602,19 +638,20 @@ namespace MCForge
                 Database.executeQuery("CREATE TABLE if not exists Players (ID INTEGER " + (Server.useMySQL ? "" : "PRIMARY KEY ") + "AUTO" + (Server.useMySQL ? "_" : "") + "INCREMENT NOT NULL, Name VARCHAR(20), IP CHAR(15), FirstLogin DATETIME, LastLogin DATETIME, totalLogin MEDIUMINT, Title CHAR(20), TotalDeaths SMALLINT, Money MEDIUMINT UNSIGNED, totalBlocks BIGINT, totalCuboided BIGINT, totalKicked MEDIUMINT, TimeSpent VARCHAR(20), color VARCHAR(6), title_color VARCHAR(6)" + (Server.useMySQL ? ", PRIMARY KEY (ID)" : "") + ");");
 				Database.executeQuery("CREATE TABLE if not exists Playercmds (ID INTEGER " + (Server.useMySQL ? "" : "PRIMARY KEY ") + "AUTO" + (Server.useMySQL ? "_" : "") + "INCREMENT NOT NULL, Time DATETIME, Name VARCHAR(20), Rank VARCHAR(20), Mapname VARCHAR(40), Cmd VARCHAR(40), Cmdmsg VARCHAR(40)" + (Server.useMySQL ? ", PRIMARY KEY (ID)" : "") + ");");
 
+                // Function to rename all current SQL Inbox tables
                 DataTable Inboxes = Server.useMySQL ? MySQL.fillData("SHOW TABLES LIKE 'Inbox%'") : SQLite.fillData("SHOW TABLES LIKE 'Inbox%'");
                 if (Inboxes.Rows.Count != 0)
                 {
-                    Server.s.Log("--------------------------");
-                    Server.s.Log("Obsolete SQL Tables Found!");
-                    Server.s.Log("Attempting to rename...");
+                    Server.s.Log("---------------------------");
+                    Server.s.Log("Incorrect SQL Tables Found!");
+                    Server.s.Log("  Attempting to rename...  ");
                     foreach (DataRow Inbox in Inboxes.Rows)
                     {
                         Database.executeQuery("RENAME TABLE " + Inbox[0] + " TO " + Inbox[0].ToString().ToLower());
                         Server.s.Log("'" + Inbox[0] + "' To: '" + Inbox[0].ToString().ToLower() + "'");
                     }
-                    Server.s.Log("        All Done!         ");
-                    Server.s.Log("--------------------------");
+                    Server.s.Log("        All Done!          ");
+                    Server.s.Log("---------------------------");
                 }
                 Inboxes.Dispose();
 

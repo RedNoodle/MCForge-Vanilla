@@ -1093,7 +1093,7 @@ namespace MCForge
 
             if (Server.zombie.ZombieStatus() != 0) { Player.SendMessage(this, "There is a Zombie Survival game currently in-progress! Join it by typing /g " + Server.zombie.currentLevelName); }
 
-            DataTable InboxExist = Server.useMySQL ? MySQL.fillData("SHOW TABLES LIKE 'inbox" + name.ToLower() + "'") : SQLite.fillData("SHOW TABLES LIKE 'inbox" + name.ToLower() + "'");
+            DataTable InboxExist = Server.useMySQL ? MySQL.fillData("SHOW TABLES LIKE 'inbox" + name.ToLower() + "'") : SQLite.fillData("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'inbox" + name.ToLower() + "'");
             if (InboxExist.Rows.Count != 0)
             {
                 DataTable InboxCount = Server.useMySQL ? MySQL.fillData("SELECT `PlayerFrom` FROM inbox" + name.ToLower() + " ") : SQLite.fillData("SELECT `PlayerFrom` FROM inbox" + name.ToLower());

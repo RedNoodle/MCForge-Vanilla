@@ -559,40 +559,47 @@ namespace MCForge
             }
 
             // Function to rename all current password files
-            DirectoryInfo passdir = new DirectoryInfo("extra/passwords/");
-            foreach (FileInfo passfile in passdir.GetFiles("*.xml"))
+            if (Directory.Exists("extra/passwords"))
             {
-                if (passfile.Name.ToString() != passfile.Name.ToLower())
+                DirectoryInfo passdir = new DirectoryInfo("extra/passwords/");
+                foreach (FileInfo passfile in passdir.GetFiles("*.xml"))
                 {
-                    Server.s.Log("Incorrect case in password file!");
-                    Server.s.Log("Attempting to rename '" + passfile.Name.ToString() + "'");
-                    passfile.MoveTo(passdir + passfile.Name.ToLower());
+                    if (passfile.Name.ToString() != passfile.Name.ToLower())
+                    {
+                        Server.s.Log("Incorrect case in password file!");
+                        Server.s.Log("Attempting to rename '" + passfile.Name.ToString() + "'");
+                        passfile.MoveTo(passdir + passfile.Name.ToLower());
+                    }
                 }
             }
-
             // Function to rename all current undo files
-            DirectoryInfo undodir = new DirectoryInfo("extra/undo/");
-            foreach (DirectoryInfo undosubdir in undodir.GetDirectories())
+            if (Directory.Exists("extra/undo"))
             {
-                if (undosubdir.Name.ToString() != undosubdir.Name.ToLower())
+                DirectoryInfo undodir = new DirectoryInfo("extra/undo/");
+                foreach (DirectoryInfo undosubdir in undodir.GetDirectories())
                 {
-                    Server.s.Log("Incorrect case in undo subfolder!");
-                    Server.s.Log("Attempting to rename subfolder '" + undosubdir.Name.ToString() + "'");
-                    undosubdir.MoveTo(undodir + undosubdir.Name.ToLower());
-				}
-			}
-
-			// Function to rename all current undoPrevious files
-            DirectoryInfo undoprevdir = new DirectoryInfo("extra/undoPrevious/");
-            foreach (DirectoryInfo undoprevsubdir in undoprevdir.GetDirectories())
-            {
-                if (undoprevsubdir.Name.ToString() != undoprevsubdir.Name.ToLower())
-                {
-                    Server.s.Log("Incorrect case in undoPrevious subfolder!");
-                    Server.s.Log("Attempting to rename subfolder '" + undoprevsubdir.Name.ToString() + "'");
-                    undoprevsubdir.MoveTo(undoprevdir + undoprevsubdir.Name.ToLower());
+                    if (undosubdir.Name.ToString() != undosubdir.Name.ToLower())
+                    {
+                        Server.s.Log("Incorrect case in undo subfolder!");
+                        Server.s.Log("Attempting to rename subfolder '" + undosubdir.Name.ToString() + "'");
+                        undosubdir.MoveTo(undodir + undosubdir.Name.ToLower());
+                    }
                 }
-			}
+            }
+			// Function to rename all current undoPrevious files
+            if (Directory.Exists("extra/undoPrevious"))
+            {
+                DirectoryInfo undoprevdir = new DirectoryInfo("extra/undoPrevious/");
+                foreach (DirectoryInfo undoprevsubdir in undoprevdir.GetDirectories())
+                {
+                    if (undoprevsubdir.Name.ToString() != undoprevsubdir.Name.ToLower())
+                    {
+                        Server.s.Log("Incorrect case in undoPrevious subfolder!");
+                        Server.s.Log("Attempting to rename subfolder '" + undoprevsubdir.Name.ToString() + "'");
+                        undoprevsubdir.MoveTo(undoprevdir + undoprevsubdir.Name.ToLower());
+                    }
+                }
+            }
 
             LoadAllSettings();
 
@@ -639,7 +646,7 @@ namespace MCForge
 				Database.executeQuery("CREATE TABLE if not exists Playercmds (ID INTEGER " + (Server.useMySQL ? "" : "PRIMARY KEY ") + "AUTO" + (Server.useMySQL ? "_" : "") + "INCREMENT NOT NULL, Time DATETIME, Name VARCHAR(20), Rank VARCHAR(20), Mapname VARCHAR(40), Cmd VARCHAR(40), Cmdmsg VARCHAR(40)" + (Server.useMySQL ? ", PRIMARY KEY (ID)" : "") + ");");
 
                 // Function to rename all current SQL Inbox tables
-                DataTable Inboxes = Server.useMySQL ? MySQL.fillData("SHOW TABLES LIKE 'Inbox%'") : SQLite.fillData("SHOW TABLES LIKE 'Inbox%'");
+                DataTable Inboxes = Server.useMySQL ? MySQL.fillData("SHOW TABLES LIKE 'Inbox%'") : SQLite.fillData("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'Inbox%'");
                 if (Inboxes.Rows.Count != 0)
                 {
                     Server.s.Log("---------------------------");

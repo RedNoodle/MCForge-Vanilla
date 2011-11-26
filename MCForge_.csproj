@@ -539,6 +539,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="sqlite3.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="app.config" />
     <Compile Include="Commands\CmdVoteKick.cs" />
     <Compile Include="Plugins\Plugin.Events.cs" />

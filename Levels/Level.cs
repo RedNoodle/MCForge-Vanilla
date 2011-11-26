@@ -352,7 +352,7 @@ namespace MCForge
             Server.levels.Remove(this);
             try
             {
-                if (Server.mono == false) { Window.thisWindow.UpdateMapList("'"); }
+                if (!Server.mono) { Window.thisWindow.UpdateMapList("'"); }
                     //Bad idea, have window check it, not level call for window to check
             }
             finally

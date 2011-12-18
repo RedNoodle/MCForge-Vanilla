@@ -549,6 +549,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="sqlite3.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Service References\TranslateService\MCForge.TranslateService.GetTranslationsResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>

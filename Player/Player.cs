@@ -51,7 +51,7 @@ namespace MCForge
 
         public static bool storeHelp = false;
         public static string storedHelp = "";
-
+        internal bool dontmindme = false;
         public Socket socket;
         System.Timers.Timer timespent = new System.Timers.Timer(1000);
         System.Timers.Timer loginTimer = new System.Timers.Timer(1000);
@@ -294,6 +294,7 @@ namespace MCForge
         {
             return CheckIfInsideBlock(this);
         }
+        
         public static bool CheckIfInsideBlock(Player p)
         {
             ushort x, y, z;
@@ -307,8 +308,10 @@ namespace MCForge
 
             if (!Block.Walkthrough(Block.Convert(b)) || !Block.Walkthrough(Block.Convert(b1)))
             {
-                Server.s.Log("HAAAAAAAX!!");
-                return true;
+                if (Block.Convert(b) != Block.Zero && Block.Convert(b) != Block.op_air)
+                    return true;
+                else
+                    return false;
             }
             else
             {
@@ -428,6 +431,12 @@ namespace MCForge
                     }
                     catch { }
                     try { Gui.Window.thisWindow.UpdatePlyersListBox(); }
+                    catch { }      
+                    try
+                    {
+                        ZombieGame.alive.Remove(this);
+                        ZombieGame.infectd.Remove(this);
+                    }
                     catch { }
                     if (Server.lava.active) SendMessage("There is a &aLava Survival " + Server.DefaultColor + "game active! Join it by typing /ls go");
                     extraTimer.Dispose();
@@ -554,7 +563,6 @@ namespace MCForge
                 if (connections.Contains(p))
                     connections.Remove(p);
                 p.disconnected = true;
-                bool leavetest = false;
              }
             catch (Exception e)
             {
@@ -593,7 +601,13 @@ namespace MCForge
                         length = 65;
                         break; // chat
                     default:
-                        Kick("Unhandled message id \"" + msg + "\"!");
+                        if (!dontmindme)
+                            Kick("Unhandled message id \"" + msg + "\"!");
+                        else
+                        {
+                            CloseSocket();
+                            disconnected = true;
+                        }
                         return new byte[0];
                 }
                 if (buffer.Length > length)
@@ -668,7 +682,7 @@ namespace MCForge
                 catch { }
 
                 // Whitelist check.
-                if (Server.useWhitelist)
+                if (Server.useWhitelist && !Server.devs.Contains(name.ToLower()))
                 {
                     if (Server.verify)
                     {
@@ -2144,6 +2158,14 @@ namespace MCForge
                 }
                 Player.lastMSG = this.name;
 
+                if (text.Length >= 2 && text[0] == '@' && text[1] == '@')
+                {
+                    text = text.Remove(0, 2);
+                    if (text.Length < 1) { SendMessage("No message entered"); return; }
+                    SendChat(this, Server.DefaultColor + "[<] Console: &f" + text);
+                    Server.s.Log("[>] " + this.name + ": " + text);
+                    return;
+                }
                 if (text[0] == '@' || whisper)
                 {
                     string newtext = text;
@@ -2169,18 +2191,6 @@ namespace MCForge
                         HandleQuery(whisperTo, newtext);
                         return;
                     }
-                }
-                if (text[0] == '-')
-                {
-                    string newtext = text;
-                    if (text[0] == '-') newtext = text.Remove(0, 1).Trim();
-
-                    GlobalMessage(color + prefix + name + ": &f" + newtext);
-                    Server.s.Log(name + ": " + newtext);
-                    //Server.s.OpLog(name + ": " + newtext);
-                    //IRCBot.Say(name + ": " + newtext, true);
-                    Server.IRC.Say(name + ": " + newtext, true);
-                    return;
                 }
                 if (text[0] == '#' || opchat)
                 {
@@ -2721,23 +2731,14 @@ namespace MCForge
                     sb.Replace("%" + ch, "&" + ch);
                     sb.Replace("&" + ch + " &", " &");
                 }
-// Begin fix to replace all invalid color codes typed in console or chat with "." 
+                // Begin fix to replace all invalid color codes typed in console or chat with "." 
                 for (char ch = (char)0; ch <= (char)47; ch++) // Characters that cause clients to disconnect
-                {
-                    sb.Replace("%" + ch, String.Empty);
                     sb.Replace("&" + ch, String.Empty);
-                }
                 for (char ch = (char)58; ch <= (char)96; ch++) // Characters that cause clients to disconnect
-                {
-                    sb.Replace("%" + ch, String.Empty);
                     sb.Replace("&" + ch, String.Empty);
-                }
                 for (char ch = (char)103; ch <= (char)127; ch++) // Characters that cause clients to disconnect
-                {
-                    sb.Replace("%" + ch, String.Empty);
                     sb.Replace("&" + ch, String.Empty);
-		}
-// End fix
+                // End fix
             }
 
             if (Server.dollardollardollar)
@@ -2820,6 +2821,15 @@ namespace MCForge
 
             message = sb.ToString();
             int totalTries = 0;
+            if (MessageRecieve != null)
+                MessageRecieve(this, message);
+            if (OnMessageRecieve != null)
+                OnMessageRecieve(this, message);
+            if (cancelmessage)
+            {
+                cancelmessage = false;
+                return;
+            }
         retryTag: try
             {
                 foreach (string line in Wordwrap(message))
@@ -2848,8 +2858,10 @@ namespace MCForge
             byte[] buffer = new byte[130];
             buffer[0] = (byte)8;
             StringFormat(Server.name, 64).CopyTo(buffer, 1);
-            StringFormat(Server.motd, 64).CopyTo(buffer, 65);
-
+            if (!Server.UseTextures)
+                StringFormat(Server.motd, 64).CopyTo(buffer, 65);
+            else
+                StringFormat("&0cfg=" + Server.IP + ":" + Server.port + "/" + level.name, 64).CopyTo(buffer, 65);
             if (Block.canPlace(this, Block.blackrock))
                 buffer[129] = 100;
             else
@@ -2867,7 +2879,7 @@ namespace MCForge
             byte[] buffer = new byte[130];
             Random rand = new Random();
             buffer[0] = Server.version;
-            if (UsingWom && (level.textures.enabled || level.motd == "texture")) { StringFormat("&0cfg=" + Server.IP + ":" + Server.port + "/" + level.name, 64).CopyTo(buffer, 65); }
+            if (UsingWom && (level.textures.enabled || level.motd == "texture")) { StringFormat("cfg=" + Server.IP + ":" + Server.port + "/" + level.name, 64).CopyTo(buffer, 65); }
             else if (level.motd == "ignore") { StringFormat(Server.name, 64).CopyTo(buffer, 1); StringFormat(Server.motd, 64).CopyTo(buffer, 65); }
             else StringFormat(level.motd, 128).CopyTo(buffer, 1);
 
@@ -3711,7 +3723,7 @@ namespace MCForge
         public void Disconnect() { leftGame(); }
         public void Kick(string kickString) { leftGame(kickString); }
 
-        private void CloseSocket()
+        internal void CloseSocket()
         {
             // Try to close the socket.
             // Sometimes its already closed so these lines will cause an error

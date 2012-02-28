@@ -105,6 +105,13 @@ namespace MCForge
                                 if (level == null)
                                 {
                                     Player.SendMessage(p, "Loading latest backup failed as well.");
+                                    Server.s.Log("Attempting to load backup before latest backup, number " + (backupNumber - 1) + " instead.");
+                                    File.Copy(backupPath + "/" + message + "/" + (backupNumber - 1) + "/" + message + ".lvl", "levels/" + message + ".lvl", true);
+                                    level = Level.Load(message);
+                                    if (level == null)
+                                    {
+                                        Player.SendMessage(p, "OMG! Loading backup before latest backup failed as well. I give up, you're on your own dude");
+                                    }
                                 }
                             } 
                             return;

@@ -4,7 +4,7 @@
 ################################################################################################################################################################
 default="normal"					##  "normal" = normal console mode, "silent" = silent background mode
 mcfdir="./"							##  Folder containing MCForge.exe
-monobin="/opt/mono-2.10/bin/mono"	##  Where is mono? Do not change if unsure. Typically "/usr/bin/mono"
+monobin="/usr/bin/mono"				##  Where is mono? Do not change if unsure. Typically "/usr/bin/mono"
 gameopt="--gc=sgen"					##  Mono garbage collector options, either "--gc=boehm" (older mono versions) or "--gc=sgen" (mono 2.8 or newer)
 gamename="RedCraft - MCForge"		##  Arbitrary name of server, will not affect actual server name
 gamepid="${mcfdir}/mcf.pid"			##  If you do not know what this is, do not worry about it, for "silent" mode only.
